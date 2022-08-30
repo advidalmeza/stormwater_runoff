@@ -1,0 +1,60 @@
+---
+title: "Example: Estimate volume of stormwater"
+author: "Alessandra Vidal Meza"
+format: html
+editor: visual
+execute:
+  warning: false
+  message: false
+---
+
+```{r}
+library(tidyverse)
+library(here)
+```
+
+We created a function `predict_runoff` under `storm_runoff.R` and added documentation using **Roxygen**. Remember, to add a Roxygen skeleton:
+
+-   Click anywhere within the function
+
+-   Go to 'Code' in the top menu and click 'Insert Roxygen Skeleton'
+
+Now, let's source the `storm_runoff.R` script so we can use the `predict_runoff` function.
+
+```{r}
+source(here::here("src", "storm_runoff.R"))
+```
+
+Next, estimate the stormwater volume for a watershed of 182 acres, over a range of estimates for the impervious fraction (from 0.6 to 0.8, by increments of 0.01).
+
+```{r}
+# Create imprevious fraction vector 
+impervious_vec <- seq(from = 0.6, to = 0.8, by = 0.01)
+
+# Use predict_runoff() function
+volume <- predict_runoff(I = impervious_vec, A = 182)
+```
+
+Let's bind into a dataframe the imprevious fraction vector and the volumes estimated by `predict_runoff()`.
+
+```{r}
+watershed_df <- data.frame(impervious_vec, volume)
+```
+
+Finally, create a plot for **watershed_df**. Save plot using **here** package.
+
+```{r}
+ggplot(data = watershed_df,
+       aes(x = impervious_vec,
+           y = volume)) +
+  geom_line() +
+  geom_point() +
+  theme_light()
+
+ggsave(here::here("figs", "watershed_volume_plot.png"),
+       height = 5, width = 8)
+```
+
+### Citation
+
+Function adapted from [NCDENR Stormwater BMP Manual](https://files.nc.gov/ncdeq/Water%20Quality/Surface%20Water%20Protection/SPU/SPU%20-%20BMP%20Manual%20Documents/BMPMan-Ch03-SWCalcs-20090616-DWQ-SPU.pdf). Instructions provided by Professor Allison Horst for the EDS 221: Scientific Programming Essentials course from the Master of Environmental Data Science program at the Bren School of Environmental Science & Management.
